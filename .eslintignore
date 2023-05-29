@@ -1,0 +1,12 @@
+node_modules
+.cache
+package.json
+.history
+esm
+lib
+dist
+temp
+.idea
+*.d.ts
+.eslintrc*
+/scripts/*

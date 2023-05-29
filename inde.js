@@ -1,0 +1,1 @@
+require('fs').renameSync('/Users/liujd/projects/antv/tech-vis/src/common/PlotAdaptor/interactions/brush-selected.ts', '/Users/liujd/projects/antv/tech-vis/src/common/PlotAdaptor/interactions/brush-selected.effect.ts')

@@ -1,0 +1,11 @@
+# Dependency directories
+*node_modules/
+.vscode
+.idea
+.history
+.changelog
+*.log
+*.zip
+coverage
+yarn-error.log
+lib
