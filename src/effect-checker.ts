@@ -2,11 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import { getCheckPlugin, safeConfig } from './babel-plugin';
 import { walkSync } from './walk-files';
+import { fileHasEffect } from './helper';
 
 const fileExts = ['.js', '.ts', '.jsx', '.tsx'];
 const excludeExts = ['.css', '.less', '.scss'];
 
-type message = [file: string, line: string | number | undefined, code: string];
+type message = [file: string, line: string | number | undefined, code: string, mayBeDelete?: boolean];
 
 
 function checkFiles(dir: string) {
@@ -58,14 +59,8 @@ function checkEffect(dir: string) {
     const { sideEffects }: { sideEffects: string[] } = require(packagePath);
 
     if (sideEffects && sideEffects.length) {
-      unKnownEffectFiles = unKnownEffectFiles.filter((file) => {
-        const hasMatch = sideEffects.some((testString) => {
-          const test = new RegExp(
-            `${testString.replaceAll('*', '.*').replaceAll('/', '\\/')}`,
-          );
-
-          return test.test(file[0]);
-        });
+      unKnownEffectFiles = unKnownEffectFiles.filter(([file]) => {
+        const hasMatch = fileHasEffect(file)
 
         return !hasMatch;
       });
@@ -108,13 +103,14 @@ export function addSideEffect({ dir }) {
 
 function getMessages(unKnownEffectFiles: message[]) {
   return unKnownEffectFiles
-    .map(([file, line, code]) => {
+    .map(([file, line, code, mayBeDelete]) => {
       const sortFile = path.relative(
         path.join(process.cwd())
         , file)
       return [
-        `\x1b[37m ${sortFile}${line ? `:${line}` : ''}`,
-        `> \x1b[31m ${code?.length > 80 ? code.substring(0, 40) + '...' : code}`,
+        `\x1b[37m${sortFile}${line ? `:${line}` : ''}`,
+        `> \x1b[31m${code?.length > 80 ? code.substring(0, 40) + '...' : code}`,
+        mayBeDelete ? '\x1b[33m如果文件存在 reexport 这行代码可能被忽略' : ''
       ].join(' ');
     })
     .join('\n')

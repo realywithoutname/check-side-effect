@@ -8,4 +8,4 @@
 *.zip
 coverage
 yarn-error.log
-lib
+lib/*

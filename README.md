@@ -1,5 +1,5 @@
 ### side-effects-checker
-`side-effects-checker` 是一个基于 babel 检查代码副作用的工具。
+`side-effects-checker` 是一个基于 babel 检查代码副作用的工具。只检查 `js`，`jsx`，`ts`，`tsx` 文件
 
 ```sh
 $ npm i side-effects-checker -g
@@ -46,4 +46,21 @@ $ side-effects-checker rename [--ext effect] [-d src]
 $ side-effects-checker add [-d es]
 ```
 
+### 我理解的 sideEffects
+sideeffect 的作用是让 webpack 可以跳过中间商，直接触达导出模块；带来的问题是如果中间商加了内容，会被忽略，可能导致逻辑执行不到。测试下来在 webpack 中他是这样运行的：
 
+```ts
+// module/a.js
+import 'xxx' // 如果这个模块没有声明有副作用，则这行代码会被忽略
+export function A() {}
+
+// module/b.effect.js
+export { A } from './a'
+
+export function B() {}
+
+// module/index.js
+import 'xxx' // index.js 没有声明有副作用，这行代码会被忽略，所以不建议 reexport 和这样的写法在一个模块出现
+export { B } from './b.effect' // 当应用中使用了 B 的时候，尽管 a.js 在 b.effect.js 没有使用，也会参与构建（默认情况下 webpack 认为所有的 NPM 包都有副作用，所以所有文件都参与构建）
+export { A } from './a' // 当应用中只使用 A 的时候，b.effect.js 不会参与构建
+```

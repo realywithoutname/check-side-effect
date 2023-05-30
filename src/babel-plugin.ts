@@ -47,7 +47,7 @@ export function getCheckPlugin({ sourceDir, messages }) {
           // import 'module'
           if (p.node.specifiers.length === 0) {
             const { code } = require('@babel/generator').default(p.node);
-            messages.push([state.filename, p.node.loc?.start?.line || '', code]);
+            messages.push([state.filename, p.node.loc?.start?.line || '', code, true]);
           }
         },
         ExpressionStatement(p, state) {
@@ -88,7 +88,7 @@ export function getCheckPlugin({ sourceDir, messages }) {
             const { code } = require('@babel/generator').default(p.node) as {
               code: string;
             };
-            messages.push([state.filename, p.node.loc?.start?.line, code]);
+            messages.push([state.filename, p.node.loc?.start?.line, `${code}`]);
           }
         },
       },
